@@ -13,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.ran_yehezkel.billcalcandroid.MainActivity
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.SplitReceiptDetails
 import com.ran_yehezkel.billcalcandroid.ui.Utils
 import com.ran_yehezkel.billcalcandroid.ui.screens.HistoryScreenUtils.ReceiptsSection
@@ -122,7 +124,7 @@ object HistoryScreenUtils
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "אין קבלות",
+                    text = stringResource(R.string.no_receipts),
                     color = Color.Gray
                 )
             }
@@ -176,7 +178,7 @@ object HistoryScreenUtils
                 Column()
                 {
                     Text(
-                        "קבלות",
+                        stringResource(R.string.history_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = headerFontSize
                     )

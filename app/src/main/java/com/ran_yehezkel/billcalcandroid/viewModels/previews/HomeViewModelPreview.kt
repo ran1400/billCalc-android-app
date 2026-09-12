@@ -64,7 +64,7 @@ class HomeViewModelPreview(repository: ReceiptRepository) : HomeViewModel(reposi
     fun networkRequestMockup(receiptImage : ImageBitmap)
     {
         val receiptItemsForPreview = Dummy.getDummyReceiptItems()
-        MoveToReceipt.create(0.0,receiptItemsForPreview, receiptImage)
+        MoveToReceipt.create(0.0,receiptItemsForPreview, receiptImage,"42bc9d7d-784b-4bf2-8b16-3c57e15153e4","2026-07-11--23-06-24")
         viewModelScope.launch {
             _uiEvents.emit(UiEvent.MoveToScreen(MainActivity.Screen.Receipt.route))
         }

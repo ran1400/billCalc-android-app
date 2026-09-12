@@ -19,7 +19,6 @@ class Dummy
 {
     companion object
     {
-
         fun getDummyReceiptsStatistics() : ReceiptsStatistics
         {
             val total  = 105.5

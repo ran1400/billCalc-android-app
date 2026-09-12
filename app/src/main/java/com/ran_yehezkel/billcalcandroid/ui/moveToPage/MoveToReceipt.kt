@@ -5,10 +5,12 @@ import com.ran_yehezkel.billcalcandroid.model.ItemInReceipt
 
 
 class MoveToReceipt private constructor(
-                    val totalPrice : Double?,
-                    val items : List<ItemInReceipt>,
-                    val receiptImage : ImageBitmap,
-                    private var isRead : Boolean = false)
+    val totalPrice : Double?,
+    val items : List<ItemInReceipt>,
+    val receiptImage : ImageBitmap,
+    val userUuid: String?,
+    val receiptId: String?,
+    private var isRead : Boolean = false)
 {
     companion object
     {
@@ -19,12 +21,12 @@ class MoveToReceipt private constructor(
             return lastInstance
         }
 
-        fun create(totalPrice: Double,items: List<ItemInReceipt>,receiptImage : ImageBitmap)
+        fun create(totalPrice: Double, items: List<ItemInReceipt>, receiptImage : ImageBitmap, userUuid: String?, receiptId: String?)
         {
             if (totalPrice == 0.0)
-                lastInstance = MoveToReceipt(null,items,receiptImage)
+                lastInstance = MoveToReceipt(null, items, receiptImage, userUuid, receiptId)
             else
-                lastInstance = MoveToReceipt(totalPrice,items,receiptImage)
+                lastInstance = MoveToReceipt(totalPrice, items, receiptImage, userUuid, receiptId)
         }
     }
 

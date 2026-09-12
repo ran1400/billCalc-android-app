@@ -1,5 +1,7 @@
 package com.ran_yehezkel.billcalcandroid.model
 
+import com.ran_yehezkel.billcalcandroid.MyApp
+import com.ran_yehezkel.billcalcandroid.R
 import java.util.Calendar
 
 object DateHelper
@@ -25,7 +27,7 @@ data class ReceiptsStatistics(val total: Double,
 data class ItemInReceipt(var name: String,
                          var isChecked : Boolean = false,
                          var price: Double,
-                         var sharedWith: Int = 0)
+                         var totalParticipants: Int = 0)
 
 
 data class ReceiptDetails(val time: Int, val totalPrice: Double,val id : Int)
@@ -59,14 +61,17 @@ data class Receipt(val time: Long = System.currentTimeMillis(),
                    val totalPrice: Double,
                    val items: List<ItemInReceipt>)
 
-enum class TimePeriod(val title: String)
+enum class TimePeriod(val titleRes: Int)
 {
-    ALL("הכל"),
-    CUSTOM("מותאם אישית"),
-    START_OF_WEEK("מתחילת השבוע"),
-    START_OF_MONTH("מתחילת החודש"),
-    LAST_WEEK("שבוע אחרון"),
-    LAST_MONTH("חודש אחרון"),
-    LAST_6_MONTHS("חצי שנה אחרונה"),
-    LAST_12_MONTHS("שנה אחרונה")
+    ALL(R.string.filter_all),
+    CUSTOM(R.string.filter_custom),
+    START_OF_WEEK(R.string.filter_start_of_week),
+    START_OF_MONTH(R.string.filter_start_of_month),
+    LAST_WEEK(R.string.filter_last_week),
+    LAST_MONTH(R.string.filter_last_month),
+    LAST_6_MONTHS(R.string.filter_last_6_months),
+    LAST_12_MONTHS(R.string.filter_last_12_months);
+
+    val title: String
+        get() = MyApp.instance.getString(titleRes)
 }

@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ran_yehezkel.billcalcandroid.MainActivity
+import com.ran_yehezkel.billcalcandroid.MyApp
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.HttpRequest
 import com.ran_yehezkel.billcalcandroid.model.ItemInReceipt
 import com.ran_yehezkel.billcalcandroid.model.ReceiptDetailsUi
@@ -107,12 +109,12 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
 
     fun networkRequestFailed(networkError : Boolean)
     {
-        val msg = if (networkError)  "שליחת הבקשה לשרת נכשלה" else "ניתוח התמונה נכשל"
+        val msg = if (networkError) MyApp.instance.getString(R.string.network_request_failed) else MyApp.instance.getString(R.string.analysis_failed)
         _showLoadingAnimation.value = false
         _showMsgDialog.value = msg
     }
 
-    fun networkRequestSucceed(receiptJson : String,receiptImage : ImageBitmap)
+    fun networkRequestSucceed(receiptJson : String, receiptImage : ImageBitmap, userUuid: String?, receiptId: String?)
     {
         try
         {
@@ -121,7 +123,7 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
             val orderItems = analyzeJson(json)
             if (orderItems.isEmpty())
             {
-                val msg = "ארעה שגיאה בניתוח הנתונים"
+                val msg = MyApp.instance.getString(R.string.data_analysis_error)
                 _showMsgDialog.value = msg
                 return
             }
@@ -130,13 +132,13 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
                 val totalItemsPrice = orderItems.sumOf { it.price }
                 if (totalItemsPrice != totalCostInTheBill)
                 {
-                    val msg = "AI בידקו את ה" + "\nהסכום בקבלה שונה מסכום הפריטים"
+                    val msg = MyApp.instance.getString(R.string.ai_check_msg)
                     viewModelScope.launch {
                         _uiEvents.emit(UiEvent.ShowToastMsg(msg))
                     }
                 }
             }
-            MoveToReceipt.create(totalCostInTheBill,orderItems,receiptImage)
+            MoveToReceipt.create(totalCostInTheBill, orderItems, receiptImage, userUuid, receiptId)
             dismissExitScreenDialog()
             viewModelScope.launch {
                 _uiEvents.emit(UiEvent.MoveToScreen(MainActivity.Screen.Receipt.route))
@@ -144,7 +146,7 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
         }
         catch (e : Exception)
         {
-            val msg = "ארעה שגיאה בניתוח הנתונים"
+            val msg = MyApp.instance.getString(R.string.data_analysis_error)
             _showMsgDialog.value = msg
         }
         finally
@@ -189,7 +191,7 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
     {
         if (image == null) {
             viewModelScope.launch {
-                _uiEvents.emit(UiEvent.ShowToastMsg("בחירת התמונה נכשלה"))
+                _uiEvents.emit(UiEvent.ShowToastMsg(MyApp.instance.getString(R.string.image_selection_failed)))
             }
             return
         }
@@ -197,7 +199,7 @@ open class HomeViewModel(val repository: ReceiptRepository): ViewModel()
         viewModelScope.launch(Dispatchers.IO) {
             val base64Image = Utils.inputStreamToBase64(image)
             if (base64Image == null) {
-                _uiEvents.emit(UiEvent.ShowToastMsg("בחירת התמונה נכשלה"))
+                _uiEvents.emit(UiEvent.ShowToastMsg(MyApp.instance.getString(R.string.image_selection_failed)))
                 _showLoadingAnimation.value = false
                 return@launch
             }

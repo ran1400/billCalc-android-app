@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,13 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ran_yehezkel.billcalcandroid.MainActivity
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.ItemInReceipt
 import com.ran_yehezkel.billcalcandroid.ui.Utils
 import com.ran_yehezkel.billcalcandroid.ui.dialogs.AddItemDialog
@@ -46,7 +52,7 @@ fun ReceiptScreenPreview()
     }
 
     val viewModel = remember {
-        ReceiptViewModelPreview(repo)
+        ReceiptViewModelPreview(repo).apply { initPage() }
     }
 
     val modifier = Modifier.fillMaxSize().padding(bottom = 36.dp,top = 16.dp)
@@ -115,7 +121,7 @@ fun ReceiptScreenContent(modifier: Modifier,viewModel: ReceiptViewModel)
     val showEditItemNameDialog by viewModel.showEditItemNameDialog.collectAsState()
     if (showEditItemNameDialog != null)
         EnterValueDialog(
-            header = "הכנס שם פריט",
+            header = stringResource(R.string.enter_item_name),
             inputText = receiptItems[showEditItemNameDialog!!].name,
             onDismiss = viewModel::dismissEditItemNameDialog,
             onConfirm = {name -> viewModel.editItemName(showEditItemNameDialog!!,name)}
@@ -123,7 +129,7 @@ fun ReceiptScreenContent(modifier: Modifier,viewModel: ReceiptViewModel)
     val showEditItemPriceDialog by viewModel.showEditItemPriceDialog.collectAsState()
     if (showEditItemPriceDialog != null)
         EnterValueDialog(
-            header = "הכנס מחיר",
+            header = stringResource(R.string.enter_price),
             isNumber = true,
             inputText = receiptItems[showEditItemPriceDialog!!].price.toString(),
             onDismiss = viewModel::dismissEditItemPriceDialog,
@@ -139,7 +145,7 @@ fun ReceiptScreenContent(modifier: Modifier,viewModel: ReceiptViewModel)
         {
             Column(modifier = modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, bottom = 16.dp))
             {
-                Header()
+                Header(viewModel)
                 Spacer(Modifier.height(8.dp))
                 LazyColumn(modifier = Modifier.weight(1f))
                 {
@@ -192,7 +198,7 @@ fun ButtonsSections(viewModel : ReceiptViewModel)
                 )
             )
             {
-                Text("הוסף פריט")
+                Text(stringResource(R.string.add_item))
             }
 
             Button(
@@ -200,7 +206,7 @@ fun ButtonsSections(viewModel : ReceiptViewModel)
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("חישוב טיפ")
+                Text(stringResource(R.string.calculate_tip))
             }
         }
     }
@@ -240,7 +246,7 @@ fun TotalAmountSection(receiptImage: ImageBitmap, totalPrice: Double,moveToImage
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "לא כולל טיפ",
+                    text = stringResource(R.string.not_including_tip),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -261,30 +267,54 @@ fun TotalAmountSection(receiptImage: ImageBitmap, totalPrice: Double,moveToImage
 }
 
 @Composable
-fun Header()
+fun Header(viewModel: ReceiptViewModel)
 {
+        val shareUrl by viewModel.shareUrl.collectAsState()
+        val clipboardManager = LocalClipboardManager.current
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 24.dp,
+                    start = 8.dp,
                     end = 4.dp,
                     top = 16.dp,
                     bottom = 16.dp
                 )
                 .background(MaterialTheme.colorScheme.surface),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         )
         {
+            if (shareUrl != null)
+            {
+                IconButton(
+                    onClick = {
+                        clipboardManager.setText(AnnotatedString(shareUrl!!))
+                    },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                        modifier = Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.width(36.dp))
+            }
+
             Text(
-                text = "פריט",
+                text = stringResource(R.string.receipt_item),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "חלקתי עם",
+                text = stringResource(R.string.shared_with),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -354,19 +384,19 @@ fun ReceiptItem(item: ItemInReceipt, index : Int, viewModel : ReceiptViewModel)
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { viewModel.sharedWithMinusBtn(index) },
+                    onClick = { viewModel.totalParticipantsMinusBtn(index) },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Text("-", fontSize = 22.sp)
                 }
 
                 Text(
-                    text = "${item.sharedWith}",
+                    text = "${item.totalParticipants}",
                     fontSize = 16.sp
                 )
 
                 IconButton(
-                    onClick = { viewModel.sharedWithPlusBtn(index) },
+                    onClick = { viewModel.totalParticipantsPlusBtn(index) },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Text("+", fontSize = 22.sp)

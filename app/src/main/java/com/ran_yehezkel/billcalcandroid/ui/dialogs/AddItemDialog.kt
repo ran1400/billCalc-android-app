@@ -16,11 +16,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
+import com.ran_yehezkel.billcalcandroid.R
 
 @Preview
 @Composable
@@ -43,7 +45,7 @@ fun AddItemDialog(
 
         title = {
             Text(
-                "הוסף פריט",
+                stringResource(R.string.add_item),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -57,7 +59,7 @@ fun AddItemDialog(
                 OutlinedTextField(
                     value = itemName,
                     onValueChange = { itemName = it },
-                    label = { Text("הכנס שם פריט") },
+                    label = { Text(stringResource(R.string.enter_item_name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -65,7 +67,7 @@ fun AddItemDialog(
                 OutlinedTextField(
                     value = priceText,
                     onValueChange = { input -> priceText = input},
-                    label = { Text("הכנס מחיר") },
+                    label = { Text(stringResource(R.string.enter_price)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = LocalTextStyle.current.copy(
@@ -88,7 +90,7 @@ fun AddItemDialog(
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Text("ביטול")
+                    Text(stringResource(R.string.cancel))
                 }
 
                 Button(
@@ -96,7 +98,7 @@ fun AddItemDialog(
                         onConfirm(itemName, priceText.toDoubleOrNull())
                     }
                 ) {
-                    Text("אישור")
+                    Text(stringResource(R.string.confirm))
                 }
             }
         }

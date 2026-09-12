@@ -12,8 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +36,7 @@ import com.ran_yehezkel.billcalcandroid.viewModels.HomeViewModel
 import com.ran_yehezkel.billcalcandroid.viewModels.ImmutableReceiptViewModel
 import com.ran_yehezkel.billcalcandroid.viewModels.StatisticsViewModel
 import androidx.activity.SystemBarStyle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.ran_yehezkel.billcalcandroid.ui.theme.Colors
 
 
@@ -95,6 +99,8 @@ class MainActivity : ComponentActivity()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        val splashScreen = installSplashScreen()
+
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 Colors.LightGrayBG.toArgb(),
@@ -102,14 +108,21 @@ class MainActivity : ComponentActivity()
             )
         )
         super.onCreate(savedInstanceState)
+
+        splashScreen.setKeepOnScreenCondition {
+            historyViewModel.isLoading.value
+        }
+
         setContent {
             MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                )
-                {
-                    MainApp()
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    )
+                    {
+                        MainApp()
+                    }
                 }
             }
         }

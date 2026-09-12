@@ -15,24 +15,26 @@ import java.util.concurrent.TimeUnit
 import org.json.JSONObject
 import java.io.IOException
 
+private const val SERVER_URL = "https://ran-y.com/bill_calc_server/"
+
 class HttpRequest
 {
     companion object
     {
+        private val client = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
         var call : Call? = null
         fun sendReceipt(
             base64Image: String,
-            onSuccess: (receiptJson: String, receiptImage: ImageBitmap) -> Unit,
+            onSuccess: (receiptJson: String, receiptImage: ImageBitmap, uuid: String?, receiptId: String?) -> Unit,
             onNetworkFailure: () -> Unit,
             onServerFailure: () -> Unit
         )
         {
-
-            val client = OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .build()
 
             val json = JSONObject().apply {
                 put("image", base64Image)
@@ -43,7 +45,7 @@ class HttpRequest
                 .toRequestBody("application/json".toMediaType())
 
             val request = Request.Builder()
-                .url("https://ran-y.com/bill_calc_server/request.php")
+                .url(SERVER_URL + "request.php")
                 .post(body)
                 .build()
 
@@ -68,46 +70,27 @@ class HttpRequest
                         onServerFailure()
                     else
                     {
-                        val res = getResFromServerResponse(responseBody)
-                        if (res == null)
+                        try {
+                            val json = JSONObject(responseBody)
+                            val res = if (json.has("res")) json.getString("res") else null
+                            if (res == null)
+                                onServerFailure()
+                            else
+                            {
+                                val uuid = if (json.has("uuid")) json.getString("uuid") else null
+                                val receiptId = if (json.has("receipt")) json.getString("receipt") else null
+                                val receiptImage = Utils.base64ToImageBitmap(base64Image)
+                                onSuccess(res, receiptImage, uuid, receiptId)
+                            }
+                        } catch (e: Exception) {
                             onServerFailure()
-                        else
-                            onSuccess(res, Utils.base64ToImageBitmap(base64Image))
+                        }
                     }
                 }
             })
-
             this.call = call
         }
 
-        fun getResFromServerResponse(responseBody : String) : String?
-        {
-            try
-            {
-                val json = JSONObject(responseBody)
-                if (json.has("res"))
-                {
-                    val res = json.getString("res")
-                    return res
-                }
-                else if (json.has("error"))
-                {
-                    val error = json.getString("error")
-                    Log.e("HomeScreenViewModel", "Error: $error")
-                    return null
-                }
-                else
-                {
-                    Log.e("HomeScreenViewModel", "Error: unknown")
-                    return null
-                }
-            }
-            catch (e : Exception)
-            {
-                Log.e("HomeScreenViewModel", "Error: $e")
-                return null
-            }
-        }
 
         fun cancelRequest()
         {

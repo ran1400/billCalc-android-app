@@ -1,3 +1,66 @@
 <resources>
     <string name="app_name">Bill Calc</string>
+
+    <!-- General -->
+    <string name="cancel">ביטול</string>
+    <string name="confirm">אישור</string>
+    <string name="save">שמור</string>
+    <string name="close">סגור</string>
+    <string name="exit">לצאת</string>
+    <string name="stay">להישאר</string>
+
+    <!-- Home Screen -->
+    <string name="upload_new_receipt">העלאת קבלה חדשה</string>
+    <string name="upload_from_gallery">העלאה מהגלריה</string>
+    <string name="capture_receipt">צילום קבלה</string>
+    <string name="last_receipts">קבלות אחרונות</string>
+    <string name="no_last_receipts">אין קבלות אחרונות</string>
+    <string name="photo_failed">צילום נכשל, נסה שוב</string>
+    <string name="image_selection_failed">בחירת התמונה נכשלה</string>
+
+    <!-- Receipt Screen -->
+    <string name="receipt_item">פריט</string>
+    <string name="shared_with">כמה אכלו?</string>
+    <string name="add_item">הוסף פריט</string>
+    <string name="calculate_tip">חישוב טיפ</string>
+    <string name="not_including_tip">לא כולל טיפ</string>
+    <string name="including_tip">כולל %1$d%% טיפ</string>
+    <string name="enter_item_name">הכנס שם פריט</string>
+    <string name="enter_price">הכנס מחיר</string>
+    <string name="item_name_empty">לא הוכנס שם פריט</string>
+    <string name="price_empty">לא הוכנס מחיר</string>
+    <string name="ai_check_msg">AI בידקו את ה\nהסכום בקבלה שונה מסכום הפריטים</string>
+    <string name="ai_check_msg_long">AI בידקו את ה\nהסכום בקבלה שונה מסכום כל הפריטים</string>
+
+    <!-- History & Statistics -->
+    <string name="history_title">קבלות</string>
+    <string name="no_receipts">אין קבלות</string>
+    <string name="total_expenses">סה\"כ הוצאות</string>
+    <string name="max_expense">ההוצאה הגדולה ביותר</string>
+    <string name="average_expense">הוצאה ממוצעת</string>
+    <string name="min_expense">ההוצאה הקטנה ביותר</string>
+    <string name="no_expenses">אין הוצאות</string>
+    <string name="no_expenses_selected_dates">אין הוצאות בתאריכים שנבחרו</string>
+
+    <!-- Dialogs -->
+    <string name="exit_screen_title">לצאת מהמסך ?</string>
+    <string name="exit_screen_message">השינויים שלך יאבדו</string>
+    <string name="custom_tip">טיפ מותאם אישית</string>
+    <string name="enter_text">הכנס טקסט</string>
+
+    <!-- Errors & Network -->
+    <string name="network_request_failed">שליחת הבקשה לשרת נכשלה</string>
+    <string name="analysis_failed">ניתוח התמונה נכשל</string>
+    <string name="data_analysis_error">ארעה שגיאה בניתוח הנתונים</string>
+    <string name="link_copied">הקישור הועתק</string>
+
+    <!-- Date Filters -->
+    <string name="filter_all">הכל</string>
+    <string name="filter_custom">מותאם אישית</string>
+    <string name="filter_start_of_week">מתחילת השבוע</string>
+    <string name="filter_start_of_month">מתחילת החודש</string>
+    <string name="filter_last_week">שבוע אחרון</string>
+    <string name="filter_last_month">חודש אחרון</string>
+    <string name="filter_last_6_months">חצי שנה אחרונה</string>
+    <string name="filter_last_12_months">שנה אחרונה</string>
 </resources>

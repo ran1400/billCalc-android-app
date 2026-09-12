@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.*
@@ -41,6 +42,9 @@ open class HistoryViewModel(private val repository: ReceiptRepository) : ViewMod
     private val _showCustomDatesPopup = MutableStateFlow<Boolean>(false)
     val showCustomDatesPopup = _showCustomDatesPopup.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
     private val _customDatesString = MutableStateFlow<String>(TimePeriod.ALL.title)
     val customDatesString = _customDatesString.asStateFlow()
 
@@ -54,12 +58,13 @@ open class HistoryViewModel(private val repository: ReceiptRepository) : ViewMod
             else
                 repository.getReceiptDetailsForPeriod(filter)
         }
+        .onEach { _isLoading.value = false }
         .map { list ->
             Utils.splitReceiptsByMonth(list)
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Lazily,
+            started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
 

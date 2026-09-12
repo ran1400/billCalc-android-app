@@ -34,7 +34,7 @@ class ReceiptRepository(private val receiptDao: ReceiptDao)
                 name = it.name,
                 isChecked = it.isChecked,
                 price = it.price,
-                sharedWith = it.sharedWith
+                totalParticipants = it.totalParticipants
             )
         }
 
@@ -60,7 +60,7 @@ class ReceiptRepository(private val receiptDao: ReceiptDao)
                     name = it.name,
                     isChecked = it.isChecked,
                     price = it.price,
-                    sharedWith = it.sharedWith
+                    totalParticipants = it.totalParticipants
                 )
             }
         )

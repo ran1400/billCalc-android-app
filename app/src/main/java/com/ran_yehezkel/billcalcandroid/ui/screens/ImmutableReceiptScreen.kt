@@ -26,11 +26,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.ItemInReceipt
 import com.ran_yehezkel.billcalcandroid.viewModels.ImmutableReceiptViewModel
 import com.ran_yehezkel.billcalcandroid.viewModels.previews.ImmutableReceiptViewModelPreview
@@ -98,13 +100,13 @@ object ReceiptViewScreenHelpers
         {
 
             Text(
-                text = "פריט",
+                text = stringResource(R.string.receipt_item),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "חלקתי עם",
+                text = stringResource(R.string.shared_with),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -140,7 +142,7 @@ object ReceiptViewScreenHelpers
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text =  "כולל " + "$tip%" +  " טיפ",
+                    text = stringResource(R.string.including_tip, tip),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -169,7 +171,7 @@ object ReceiptViewScreenHelpers
             }
             Row()
             {
-                Text(text = "${item.sharedWith}",fontSize = 16.sp)
+                Text(text = "${item.totalParticipants}",fontSize = 16.sp)
                 Spacer(Modifier.width(32.dp))
             }
 

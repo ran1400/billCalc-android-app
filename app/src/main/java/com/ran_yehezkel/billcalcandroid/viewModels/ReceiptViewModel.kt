@@ -3,6 +3,8 @@ package com.ran_yehezkel.billcalcandroid.viewModels
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ran_yehezkel.billcalcandroid.MyApp
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.ItemInReceipt
 import com.ran_yehezkel.billcalcandroid.model.Receipt
 import com.ran_yehezkel.billcalcandroid.model.ReceiptRepository
@@ -13,6 +15,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+private const val SHARE_URL = "https://ran-y.com/bill_calc_receipt_share/"
+
 open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
 {
 
@@ -22,10 +26,10 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
         object MoveToHomeScreen : UiEvent()
     }
 
-    private val _receiptItems = MutableStateFlow<List<ItemInReceipt>>(listOf())
+    protected val _receiptItems = MutableStateFlow<List<ItemInReceipt>>(listOf())
     open val receiptItems = _receiptItems.asStateFlow()
 
-    private val  _receiptImage = MutableStateFlow(ImageBitmap(1,1))
+    protected val  _receiptImage = MutableStateFlow(ImageBitmap(1,1))
     open val receiptImage = _receiptImage.asStateFlow()
     private val _showExitScreenDialog = MutableStateFlow<String?>(null)
     val showExitScreenDialog = _showExitScreenDialog.asStateFlow()
@@ -46,6 +50,9 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
     private val _totalPrice = MutableStateFlow<Double>(0.0)
     val totalPrice = _totalPrice.asStateFlow()
 
+    protected val _shareUrl = MutableStateFlow<String?>(null)
+    open val shareUrl = _shareUrl.asStateFlow()
+
     private val _uiEvents = MutableSharedFlow<UiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
@@ -61,12 +68,17 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
         _receiptItems.value = items
         _receiptImage.value = moveToReceipt.receiptImage
         _totalPrice.value = 0.0
+
+        if (moveToReceipt.userUuid != null && moveToReceipt.receiptId != null) {
+            _shareUrl.value = "$SHARE_URL?uuid=${moveToReceipt.userUuid}&receipt=${moveToReceipt.receiptId}"
+        }
+
         if (totalPrice != null)
         {
             val isValidTotalCost = validateTotalCostInBill(items,totalPrice)
             if (isValidTotalCost == false)
             {
-                val msg = "AI בידקו את ה" + "\nהסכום בקבלה שונה מסכום כל הפריטים"
+                val msg = MyApp.instance.getString(R.string.ai_check_msg_long)
                 viewModelScope.launch {
                     _uiEvents.emit(UiEvent.ShowMsg(msg))
                 }
@@ -107,27 +119,39 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
     fun itemChecked(index: Int, isChecked: Boolean)
     {
         val newList = _receiptItems.value.toMutableList()
-        newList[index] = newList[index].copy(isChecked = isChecked)
+        val item = newList[index]
+        newList[index] = item.copy(
+            isChecked = isChecked,
+            totalParticipants = if (isChecked) 1 else 0
+        )
         _receiptItems.value = newList
         refreshTotalPrice()
     }
 
-    fun sharedWithPlusBtn(index: Int)
+    fun totalParticipantsPlusBtn(index: Int)
     {
         val newList = _receiptItems.value.toMutableList()
         val prevItem = newList[index]
-        newList[index] = newList[index].copy(sharedWith = prevItem.sharedWith + 1)
+        newList[index] = prevItem.copy(
+            totalParticipants = prevItem.totalParticipants + 1,
+            isChecked = true
+        )
         _receiptItems.value = newList
         refreshTotalPrice()
     }
 
-    fun sharedWithMinusBtn(index: Int)
+    fun totalParticipantsMinusBtn(index: Int)
     {
         val newList = _receiptItems.value.toMutableList()
         val prevItem = newList[index]
-        if (prevItem.sharedWith == 0)
+        if (prevItem.totalParticipants <= 0)
             return
-        newList[index] = newList[index].copy(sharedWith = prevItem.sharedWith - 1)
+
+        val newCount = prevItem.totalParticipants - 1
+        newList[index] = prevItem.copy(
+            totalParticipants = newCount,
+            isChecked = newCount > 0
+        )
         _receiptItems.value = newList
         refreshTotalPrice()
     }
@@ -136,7 +160,7 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
     {
         val itemsList = _receiptItems.value
         _totalPrice.value = itemsList.filter { it.isChecked }
-            .sumOf { it.price / (it.sharedWith + 1) }
+            .sumOf { it.price / it.totalParticipants }
     }
 
     fun showAddTipDialog(bool : Boolean)
@@ -156,9 +180,9 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
         {
             var msg : String
             if (name.isEmpty())
-                msg = "לא הוכנס שם פריט"
+                msg = MyApp.instance.getString(R.string.item_name_empty)
             else // price == null
-                msg = "לא הוכנס מחיר"
+                msg = MyApp.instance.getString(R.string.price_empty)
             viewModelScope.launch {
                 _uiEvents.emit(UiEvent.ShowMsg(msg))
             }
@@ -196,7 +220,7 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
     {
         if (name.isEmpty())
         {
-            val msg = "לא הוכנס שם פריט"
+            val msg = MyApp.instance.getString(R.string.item_name_empty)
             viewModelScope.launch {
                 _uiEvents.emit(UiEvent.ShowMsg(msg))
             }
@@ -215,7 +239,7 @@ open class ReceiptViewModel(val repository: ReceiptRepository): ViewModel()
         val newPrice = price.toDoubleOrNull()
         if (newPrice == null)
         {
-            val msg = "לא הוכנס מחיר"
+            val msg = MyApp.instance.getString(R.string.price_empty)
             viewModelScope.launch {
                 _uiEvents.emit(UiEvent.ShowMsg(msg))
             }

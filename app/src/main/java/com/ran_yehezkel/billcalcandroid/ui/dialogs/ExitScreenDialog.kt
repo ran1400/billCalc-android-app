@@ -6,11 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.ran_yehezkel.billcalcandroid.R
 
 @Composable
 @Preview
@@ -39,13 +41,13 @@ fun ExitScreenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit)
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "לצאת מהמסך ?",
+                    text = stringResource(R.string.exit_screen_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "השינויים שלך יאבדו",
+                    text = stringResource(R.string.exit_screen_message),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -58,7 +60,7 @@ fun ExitScreenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit)
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("להישאר")
+                        Text(stringResource(R.string.stay))
                     }
 
                     Button(
@@ -68,7 +70,7 @@ fun ExitScreenDialog(onConfirm: () -> Unit, onDismiss: () -> Unit)
                             containerColor = MaterialTheme.colorScheme.error
                         )
                     ) {
-                        Text("לצאת")
+                        Text(stringResource(R.string.exit))
                     }
                 }
             }

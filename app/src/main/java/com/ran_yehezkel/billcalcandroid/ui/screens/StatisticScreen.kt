@@ -12,13 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.ran_yehezkel.billcalcandroid.MainActivity
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.ReceiptDetailsUi
 import com.ran_yehezkel.billcalcandroid.model.ReceiptsStatistics
 import com.ran_yehezkel.billcalcandroid.ui.Utils
@@ -91,13 +94,13 @@ fun StatisticsScreenContent(modifier: Modifier,viewModel: StatisticsViewModel)
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             )
             {
                 val selectedFilter by viewModel.selectedFilter.collectAsState()
-                Utils.FiltersRow(Modifier.padding(16.dp), selectedFilter, {viewModel.setFilter(it)})
+                Utils.FiltersRow(Modifier, selectedFilter, {viewModel.setFilter(it)})
             }
-
+            Spacer(modifier = Modifier.height(8.dp))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -130,9 +133,9 @@ fun StatisticsSegment(receiptsStatistics : ReceiptsStatistics?,viewModel: Statis
         minReceiptOnClick = { viewModel.onReceiptClicked(minReceiptDetailsUi.id) }
         averageReceiptPrice = "%.0f₪".format(receiptsStatistics.average)
     }
-    SummaryCard("ההוצאה הגדולה ביותר",maxReceiptPrice,maxReceiptDate,maxReceiptOnClick)
-    SummaryCard(label = "הוצאה ממוצעת", price = averageReceiptPrice)
-    SummaryCard(label = "ההוצאה הקטנה ביותר",minReceiptPrice,minReceiptDate,minReceiptOnClick)
+    SummaryCard(stringResource(R.string.max_expense),maxReceiptPrice,maxReceiptDate,maxReceiptOnClick)
+    SummaryCard(label = stringResource(R.string.average_expense), price = averageReceiptPrice)
+    SummaryCard(label = stringResource(R.string.min_expense),minReceiptPrice,minReceiptDate,minReceiptOnClick)
 }
 
 @Composable
@@ -140,7 +143,7 @@ fun Header(receiptsStatistics: ReceiptsStatistics, date : String)
 {
     val totalPrices = "%.0f₪".format(receiptsStatistics.total)
     Text(
-        text = "סה\"כ הוצאות",
+        text = stringResource(R.string.total_expenses),
         fontSize = 28.sp,
         fontWeight = FontWeight.ExtraBold,
         color = Color.Black
@@ -164,10 +167,10 @@ fun Header(receiptsStatistics: ReceiptsStatistics, date : String)
 @Composable
 fun BlankHeader(date : String)
 {
-    if (date == "הכל")
+    if (date == stringResource(R.string.filter_all))
     {
         Text(
-            text = "אין הוצאות",
+            text = stringResource(R.string.no_expenses),
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.Black
@@ -175,7 +178,7 @@ fun BlankHeader(date : String)
         return
     }
     Text(
-        text = "אין הוצאות בתאריכים שנבחרו",
+        text = stringResource(R.string.no_expenses_selected_dates),
         fontSize = 16.sp,
         fontWeight = FontWeight.ExtraBold,
         color = Color.Black

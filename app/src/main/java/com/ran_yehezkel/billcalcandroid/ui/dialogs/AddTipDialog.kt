@@ -30,12 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ran_yehezkel.billcalcandroid.R
 
 @Preview
 @Composable
@@ -118,7 +120,7 @@ fun AddTipDialog(
                         keyboardType = KeyboardType.Number
                     ),
                     singleLine = true,
-                    label = { Text("טיפ מותאם אישית") },
+                    label = { Text(stringResource(R.string.custom_tip)) },
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center,color = Color.Red),
                 )
             }
@@ -139,13 +141,13 @@ fun AddTipDialog(
                         contentColor = MaterialTheme.colorScheme.primary
                     ),
                 ) {
-                    Text("ביטול")
+                    Text(stringResource(R.string.cancel))
                 }
 
                 Button(
                     onClick = { onSave(selectedPercent,finalAmount) }
                 ) {
-                    Text("שמור")
+                    Text(stringResource(R.string.save))
                 }
             }
         }

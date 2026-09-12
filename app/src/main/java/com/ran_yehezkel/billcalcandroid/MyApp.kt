@@ -30,7 +30,9 @@ class MyApp : Application()
             applicationContext,
             AppDatabase::class.java,
             "receipts_db"
-        ).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
 
         receiptRepository = ReceiptRepository(db.receiptDao())
     }

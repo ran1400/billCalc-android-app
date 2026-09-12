@@ -16,9 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
+import com.ran_yehezkel.billcalcandroid.R
 
 
 @Preview
@@ -28,7 +30,7 @@ fun EnterValueDialogPreview()
     EnterValueDialog(
         onConfirm = {},
         onDismiss = {},
-        header = "הכנס טקסט",
+        header = stringResource(R.string.enter_text),
         inputText = "",
         isNumber = false)
 }
@@ -61,7 +63,7 @@ fun EnterValueDialog(
                 OutlinedTextField(
                     value = text,
                     onValueChange = { input -> text = input},
-                    label = { Text("הכנס מחיר") },
+                    label = { Text(stringResource(R.string.enter_price)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     textStyle = LocalTextStyle.current.copy(
@@ -94,13 +96,13 @@ fun EnterValueDialog(
                         contentColor = MaterialTheme.colorScheme.primary
                     ),
                 ) {
-                    Text("ביטול")
+                    Text(stringResource(R.string.cancel))
                 }
 
                 Button(
                     onClick = { onConfirm(text) }
                 ) {
-                    Text("אישור")
+                    Text(stringResource(R.string.confirm))
                 }
             }
         }

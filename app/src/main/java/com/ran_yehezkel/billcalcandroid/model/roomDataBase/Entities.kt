@@ -37,7 +37,7 @@ data class ItemEntity(
     val name: String,
     val isChecked: Boolean,
     val price: Double,
-    val sharedWith: Int
+    val totalParticipants: Int
 )
 
 data class ReceiptWithItems(

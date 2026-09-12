@@ -33,12 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.ran_yehezkel.billcalcandroid.MainActivity
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.viewModels.previews.HomeViewModelPreview
 import java.io.File
 import com.ran_yehezkel.billcalcandroid.model.ReceiptDetailsUi
@@ -98,7 +100,7 @@ fun HomeScreen(modifier: Modifier,
             else
             {
                 Log.d("HomeScreen", "Camera returned success=false, photoUri=$photoUri")
-                Toast.makeText(context, "צילום נכשל, נסה שוב", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.photo_failed), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -213,7 +215,7 @@ object HomeScreenUtils
             else
             {
                 Text(
-                    text = "קבלות אחרונות",
+                    text = stringResource(R.string.last_receipts),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -251,7 +253,7 @@ object HomeScreenUtils
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "אין קבלות אחרונות",
+                text = stringResource(R.string.no_last_receipts),
                 color = Color.Gray
             )
         }
@@ -271,7 +273,7 @@ object HomeScreenUtils
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "העלאת קבלה חדשה",
+                    text = stringResource(R.string.upload_new_receipt),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -281,8 +283,8 @@ object HomeScreenUtils
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    ActionBox(icon = Icons.Default.PhotoLibrary, label = "העלאה מהגלריה",viewModel::openGallery)
-                    ActionBox(icon = Icons.Default.PhotoCamera, label = "צילום קבלה",viewModel::openCamera)
+                    ActionBox(icon = Icons.Default.PhotoLibrary, label = stringResource(R.string.upload_from_gallery),viewModel::openGallery)
+                    ActionBox(icon = Icons.Default.PhotoCamera, label = stringResource(R.string.capture_receipt),viewModel::openCamera)
                 }
             }
         }

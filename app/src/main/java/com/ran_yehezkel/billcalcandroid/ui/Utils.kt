@@ -1,9 +1,9 @@
 package com.ran_yehezkel.billcalcandroid.ui
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.horizontalScroll
@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,14 +46,18 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.room.Room
+import com.ran_yehezkel.billcalcandroid.R
 import com.ran_yehezkel.billcalcandroid.model.ReceiptRepository
 import com.ran_yehezkel.billcalcandroid.model.roomDataBase.AppDatabase
 import com.ran_yehezkel.billcalcandroid.model.TimePeriod
@@ -100,7 +108,7 @@ class Utils
                             verticalAlignment = Alignment.CenterVertically
                         ) {
 
-                            TextButton(onClick = onDismiss) { Text("ביטול", fontSize = 16.sp) }
+                            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel), fontSize = 16.sp) }
                             TextButton(
                                 onClick = {
                                     onConfirm(dateRangePickerState.selectedStartDateMillis!!, dateRangePickerState.selectedEndDateMillis!!)
@@ -109,7 +117,7 @@ class Utils
                                         dateRangePickerState.selectedEndDateMillis != null
                             )
                             {
-                                Text("אישור", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.confirm), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -120,19 +128,75 @@ class Utils
         @Composable
         fun FiltersRow(modifier: Modifier,selectedFilter : TimePeriod,onFilterChanged : (TimePeriod) -> Unit)
         {
-            Row(
+            val scrollState = rememberScrollState()
+            val filters = listOf(
+                TimePeriod.ALL,
+                TimePeriod.START_OF_WEEK,
+                TimePeriod.START_OF_MONTH,
+                TimePeriod.LAST_WEEK,
+                TimePeriod.LAST_MONTH,
+                TimePeriod.LAST_6_MONTHS,
+                TimePeriod.LAST_12_MONTHS,
+                TimePeriod.CUSTOM
+            )
+
+            Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .height(80.dp)
             ) {
-                TimePeriod.entries.forEach { filter ->
-                    FilterChip(
-                        label = filter.title,
-                        isSelected = selectedFilter == filter,
-                        onClick = {onFilterChanged(filter)}
-                    )
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .horizontalScroll(scrollState)
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // This spacer aligns the first chip with the scrollbar track (16dp)
+                    // 8dp (Spacer) + 8dp (spacedBy) = 16dp
+                    Spacer(modifier = Modifier.width(8.dp))
+                    filters.forEach { filter ->
+                        FilterChip(
+                            label = filter.title,
+                            isSelected = selectedFilter == filter,
+                            onClick = {onFilterChanged(filter)}
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Persistent Scrollbar
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 8.dp)
+                        .fillMaxWidth()
+                        .height(5.dp) // Thicker indicator
+                        .background(Color.LightGray.copy(alpha = 0.3f), CircleShape)
+                ) {
+                    val maxScroll = scrollState.maxValue.toFloat()
+                    if (maxScroll > 0) {
+                        val thumbWidthFraction = 0.2f
+                        val scrollFraction = scrollState.value.toFloat() / maxScroll
+                        val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(thumbWidthFraction)
+                                .fillMaxHeight()
+                                .align(Alignment.CenterStart)
+                                .graphicsLayer {
+                                    // In RTL, translationX moves to the right. 
+                                    // CenterStart is on the right, so we need negative translation to move left.
+                                    val availableWidth = size.width * 4f
+                                    translationX = if (isRtl) -scrollFraction * availableWidth else scrollFraction * availableWidth
+                                }
+                                .background(Color.Gray.copy(alpha = 0.5f), CircleShape)
+                        )
+                    }
                 }
             }
         }
@@ -141,14 +205,21 @@ class Utils
         fun FilterChip(label: String, isSelected: Boolean, onClick: () -> Unit)
         {
             Surface(
-                color = if (isSelected) Color(0xFFE8F5E9) else Color(0xFFF5F5F5),
+                onClick = onClick,
+                color = if (isSelected) Color(0xFF2E7D32).copy(alpha = 0.15f) else Color.Transparent,
                 shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.clickable(onClick = onClick)
+                border = BorderStroke(
+                    width = if (isSelected) 1.5.dp else 1.dp,
+                    color = if (isSelected) Color(0xFF2E7D32) else Color.LightGray.copy(alpha = 0.6f)
+                ),
+                modifier = Modifier.padding(bottom = 4.dp)
             ) {
                 Text(
                     text = label,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     fontSize = 14.sp,
+                    color = if (isSelected) Color(0xFF2E7D32) else Color.Black.copy(alpha = 0.87f),
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Clip
                 )
